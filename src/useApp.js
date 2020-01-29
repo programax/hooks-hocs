@@ -4,14 +4,7 @@ import useApi from './hooks/useApi';
 import useTabStatus from './hooks/useTabStatus';
 import useInterval from './hooks/useInterval';
 
-// puedes reutilizar withApp por ejemplo en withSelect withButton withPhotoPicker
-// with* seria como el controlador y el componente que se le pasa seria la vista
-
-// A/B testing
-
-// easier testing with mocks
-
-const withApp = (WrappedComponent) => (props) => {
+function useApp() {
     const { data, refetch } = useApi();
     const { hasFocus } = useTabStatus();
     useInterval(useCallback(() => {
@@ -20,16 +13,11 @@ const withApp = (WrappedComponent) => (props) => {
         }
     }, [hasFocus, refetch]), 1000);
 
-    return (
-        <WrappedComponent
-            {...props}
-            data={data}
-        />
-    );
-};
+    return { data, refetch, hasFocus };
+}
 
-function App(props) {
-    const { data } = props;
+export function AppA(props) {
+    const { data } = useApp();
 
     return (
         <div>
@@ -45,4 +33,19 @@ function App(props) {
     );
 }
 
-export default withApp(App);
+export function AppB(props) {
+    const { data } = useApp();
+
+    return (
+        <div>
+            <h1 className="asdasd">AAAA</h1>
+            {data && (
+                <ul>
+                    {data.map((next) => (
+                        <li key={next.id}>{next.name}</li>
+                    ))}
+                </ul>
+            )}
+        </div>
+    );
+}
